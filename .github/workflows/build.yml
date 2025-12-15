@@ -42,10 +42,8 @@ jobs:
           # - arm_cortex-a9_neon
           # - arm_cortex-a9_vfpv3-d16
           # - arm_fa526
-          # #- arm_mpcore
           # - arm_xscale
           # - mips_24kc
-          # #- mips_4kec
           # - mips_mips32
           # - mipsel_24kc
           # - mipsel_24kc_24kf
@@ -69,12 +67,12 @@ jobs:
             dl
           key: sdk-${{ matrix.arch }}-${{ matrix.sdk }}
           
-      - name: Overwrite i18n file
-        run: |
-          cat > luci-app-frpc/root/etc/uci-defaults/luci-i18n-frpc-zh-cn << 'EOF'
-          #!/bin/sh
-          exit 0
-          EOF
+      # - name: Overwrite i18n file
+      #   run: |
+      #     cat > luci-app-frpc/root/etc/uci-defaults/luci-i18n-frpc-zh-cn << 'EOF'
+      #     #!/bin/sh
+      #     exit 0
+      #     EOF
           
       - name: Building packages
         uses: openwrt/gh-action-sdk@main
@@ -98,7 +96,7 @@ jobs:
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           echo "build_time=$(TZ=UTC-8 date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
-          #tar -zcvf frp-${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
+          #tar -zcvf luci-app-frp-${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
           # zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.arch }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
           zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
 
@@ -109,11 +107,11 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
             body: |
 
-             > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }}?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.TAG }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github)
+             > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }}-luci-app-frpc?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.TAG }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github)
 
              - 其中 **`24.10.4`** 里面是ipk安装包 **`SNAPSHOT`** 里面是apk安装包
 
-             - **`*.apk` 是OpenWrt新版的APK包** 对于apk包跳过证书命令
+             - **`*.apk` 是OpenWrt新版的APK包** 对于apk包跳过证书安装命令
              `apk add --allow-untrusted luci-app-frpc.apk`
 
              ${{ github.event.inputs.text }}
