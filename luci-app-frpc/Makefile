@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_VERSION:=20251215cn
+PKG_VERSION:=20250610
 PKG_RELEASE:=1
 
 LUCI_TITLE:=LuCI support for Frpc
