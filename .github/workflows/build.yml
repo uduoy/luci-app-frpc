@@ -99,7 +99,8 @@ jobs:
           sudo timedatectl set-timezone "Asia/Shanghai"
           echo "build_time=$(TZ=UTC-8 date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
           #tar -zcvf frp-${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
-          zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.arch }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
+          # zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.arch }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
+          zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
 
       - name: Release
         if: ${{ github.event.inputs.tag != '' }}
@@ -118,5 +119,5 @@ jobs:
              ${{ github.event.inputs.text }}
            
             tag_name: ${{ env.TAG }}
-            files: luci-app-frp-${{ env.TAG }}-${{ matrix.arch }}-${{ matrix.sdk }}.zip
+            files: luci-app-frp-${{ env.TAG }}-${{ matrix.sdk }}.zip
  
