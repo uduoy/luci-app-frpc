@@ -1,12 +1,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=7
+PKG_RELEASE:=8
 PKG_NAME:=luci-app-frpc
 
 LUCI_TITLE:=LuCI support for Frpc
 LUCI_DEPENDS:=+libc
 LUCI_PKGARCH:=all
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/frpc
+endef
 
 # 安装前脚本，若存在同名配置文件，本配置文件会被重命名但旧配置文件可能不兼容，导致luci界面首页空白。
 define Package/$(PKG_NAME)/preinst
