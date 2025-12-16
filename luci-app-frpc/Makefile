@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=2
+PKG_RELEASE:=4
 PKG_NAME:=luci-app-frpc
 
 LUCI_TITLE:=LuCI support for Frpc
@@ -11,7 +11,7 @@ LUCI_PKGARCH:=all
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
 if [ -f /etc/config/frpc ] ; then
-  [ -n "\$(uci -q show frpc.main)" ] && exit 0
+  uci show frpc.main >/dev/null 2>&1 && exit 0
   echo "备份旧 uci 配置文件 /etc/config/frpc 到 /etc/config/frpc.old"
   /etc/init.d/frpc stop 2>/dev/null
   mv -f /etc/config/frpc /etc/config/frpc.old
