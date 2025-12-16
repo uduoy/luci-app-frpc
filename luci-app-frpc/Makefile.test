@@ -8,7 +8,7 @@ LUCI_TITLE:=LuCI support for Frpc
 LUCI_DEPENDS:=+libc
 LUCI_PKGARCH:=all
 
-# 建议进行宏定义，设置某些文件权限
+# 实测INSTALL_BIN和显式chmod都不能给脚本x权限，原因不明
 define Package/$(PKG_NAME)/install
 $(INSTALL_DIR) $(1)/usr/lib/lua
 $(INSTALL_DIR) $(1)/usr/lib/lua/luci
@@ -47,7 +47,7 @@ fi
 exit 0
 endef
 
-# 安装后脚本
+# 安装后脚本,可以权限，但不建议
 # define Package/$(PKG_NAME)/postinst
 # #!/bin/sh
 # chmod 0755 /etc/init.d/frpc
