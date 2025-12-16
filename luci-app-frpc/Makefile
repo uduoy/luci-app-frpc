@@ -13,7 +13,7 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/frpc
 endef
 
-define Package/$(PKG_NAME)/prerm
+define Package/$(PKG_NAME)/preinst
 #!/bin/sh
 if [ -f /etc/config/frpc ] ; then
   echo "备份旧 uci 配置文件 /etc/config/frpc 到 /etc/config/frpc.old"
@@ -23,10 +23,10 @@ fi
 exit 0
 endef
 
-define Package/$(PKG_NAME)/postinst
-endef
+# define Package/$(PKG_NAME)/postinst
+# endef
 
-$(eval $(call BuildPackage,$(PKG_NAME)))
+# $(eval $(call BuildPackage,$(PKG_NAME)))
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
