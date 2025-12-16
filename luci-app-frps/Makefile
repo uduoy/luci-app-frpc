@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=2
+PKG_RELEASE:=4
 PKG_NAME:=luci-app-frps
 
 LUCI_TITLE:=LuCI support for Frps
@@ -11,7 +11,7 @@ LUCI_PKGARCH:=all
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
 if [ -f /etc/config/frps ] ; then
-  [ -n "\$(uci -q show frps.main)" ] && exit 0
+  uci show frps.main >/dev/null 2>&1 && exit 0
   echo "备份旧 uci 配置文件 /etc/config/frps 到 /etc/config/frps.old"
   /etc/init.d/frps stop 2>/dev/null
   mv -f /etc/config/frps /etc/config/frps.old
