@@ -73,6 +73,11 @@ jobs:
       #     #!/bin/sh
       #     exit 0
       #     EOF
+
+      - name: 强制设置脚本权限
+        run: |
+          chmod 0755 luci-app-frpc/root/etc/init.d/frpc
+          chmod 0755 luci-app-frps/root/etc/init.d/frps
           
       - name: Building packages
         uses: openwrt/gh-action-sdk@main
