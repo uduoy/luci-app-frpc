@@ -52,9 +52,9 @@ jobs:
           - x86_64
           
         sdk:
-          - 24.10.4
+          - 22.03.7
           - SNAPSHOT
-
+# 为何22.03.7，高版本24.10.4会增加依赖luci-lua-runtime导致低版本系统装不上ipk
     steps:
       - uses: actions/checkout@v4
         with:
