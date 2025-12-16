@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 PKG_NAME:=luci-app-frps
 
 LUCI_TITLE:=LuCI support for Frps
@@ -29,6 +29,7 @@ $(INSTALL_DATA) ./luasrc/controller/*.lua $(1)/usr/lib/lua/luci/controller/
 $(INSTALL_DATA) ./luasrc/model/cbi/frps/*.lua $(1)/usr/lib/lua/luci/model/cbi/frps/
 $(INSTALL_DATA) ./luasrc/view/frps/* $(1)/usr/lib/lua/luci/view/frps/
 $(INSTALL_BIN) 	./root/etc/init.d/frps $(1)/etc/init.d/frps
+chmod 0755 $(1)/etc/init.d/frps
 $(INSTALL_CONF) ./root/etc/config/frps $(1)/etc/config/frps
 $(INSTALL_DATA) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
 $(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/* $(1)/usr/share/rpcd/acl.d/
