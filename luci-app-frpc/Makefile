@@ -1,14 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 PKG_NAME:=luci-app-frpc
 
 LUCI_TITLE:=LuCI support for Frpc
 LUCI_DEPENDS:=+libc
 LUCI_PKGARCH:=all
 
-# 建议进行宏定义，避免文件权限不对
+# 建议进行宏定义，设置某些文件权限
 define Package/$(PKG_NAME)/install
 $(INSTALL_DIR) $(1)/usr/lib/lua
 $(INSTALL_DIR) $(1)/usr/lib/lua/luci
@@ -29,6 +29,7 @@ $(INSTALL_DATA) ./luasrc/controller/*.lua $(1)/usr/lib/lua/luci/controller/
 $(INSTALL_DATA) ./luasrc/model/cbi/frpc/*.lua $(1)/usr/lib/lua/luci/model/cbi/frpc/
 $(INSTALL_DATA) ./luasrc/view/frpc/* $(1)/usr/lib/lua/luci/view/frpc/
 $(INSTALL_BIN) 	./root/etc/init.d/frpc $(1)/etc/init.d/frpc
+chmod 0755 $(1)/etc/init.d/frpc
 $(INSTALL_CONF) ./root/etc/config/frpc $(1)/etc/config/frpc
 $(INSTALL_DATA) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
 $(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/* $(1)/usr/share/rpcd/acl.d/
