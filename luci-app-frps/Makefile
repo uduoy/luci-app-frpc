@@ -1,13 +1,40 @@
 include $(TOPDIR)/rules.mk
 
 PKG_VERSION:=20251216
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 PKG_NAME:=luci-app-frps
 
 LUCI_TITLE:=LuCI support for Frps
 LUCI_DEPENDS:=+libc
 LUCI_PKGARCH:=all
 
+# 建议进行宏定义，避免文件权限不对
+define Package/$(PKG_NAME)/install
+$(INSTALL_DIR) $(1)/usr/lib/lua
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/frps
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view
+$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/frps
+$(INSTALL_DIR) $(1)/etc/init.d
+$(INSTALL_DIR) $(1)/etc/config
+$(INSTALL_DIR) $(1)/etc/uci-defaults
+$(INSTALL_DIR) $(1)/usr/share
+$(INSTALL_DIR) $(1)/usr/share/rpcd	
+$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+
+$(INSTALL_DATA) ./luasrc/controller/*.lua $(1)/usr/lib/lua/luci/controller/
+$(INSTALL_DATA) ./luasrc/model/cbi/frps/*.lua $(1)/usr/lib/lua/luci/model/cbi/frps/
+$(INSTALL_DATA) ./luasrc/view/frps/* $(1)/usr/lib/lua/luci/view/frps/
+$(INSTALL_BIN) 	./root/etc/init.d/frps $(1)/etc/init.d/frps
+$(INSTALL_CONF) ./root/etc/config/frps $(1)/etc/config/frps
+$(INSTALL_DATA) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
+$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/* $(1)/usr/share/rpcd/acl.d/
+endef
+
+# 安装前脚本，若存在同名配置文件，本配置文件会被重命名但旧配置文件可能不兼容，导致luci界面首页空白
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
 if [ -f /etc/config/frps ] ; then
@@ -16,12 +43,6 @@ if [ -f /etc/config/frps ] ; then
   /etc/init.d/frps stop 2>/dev/null
   mv -f /etc/config/frps /etc/config/frps.old
 fi
-exit 0
-endef
-
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-chmod 0755 /etc/init.d/frps
 exit 0
 endef
 
