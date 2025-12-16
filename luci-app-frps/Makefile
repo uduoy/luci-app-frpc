@@ -4,6 +4,7 @@ PKG_VERSION:=20251216
 PKG_RELEASE:=8
 PKG_NAME:=luci-app-frps
 
+# 高版本24.10.4的sdk会增加依赖luci-lua-runtime导致低版本系统装不上ipk，建议22.03.7
 LUCI_TITLE:=LuCI support for Frps
 LUCI_DEPENDS:=+libc
 LUCI_PKGARCH:=all
