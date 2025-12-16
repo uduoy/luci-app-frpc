@@ -11,3 +11,5 @@ toml 配置文件格式，必须frp版本不低于v0.52.0
 
 对于apk包跳过证书安装命令
 apk add --allow-untrusted luci-app-frpc.apk
+
+https://github.com/superzjg/luci-app-frpc_frps/blob/main/luci_frp.jpeg
