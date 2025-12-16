@@ -107,9 +107,10 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
             body: |
 
-             > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }}-luci-app-frpc?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.TAG }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github)
+             > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }}-easytier?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.TAG }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github)
 
-             - 其中 **`24.10.4`** 里面是ipk安装包 **`SNAPSHOT`** 里面是apk安装包
+             - 其中 **`24.10.4`** 里面是ipk安装包 **`SNAPSHOT`** 里面是apk安装包。注意：不包含二进制可执行文件，可到下面链接下载：
+             https://github.com/fatedier/frp/releases
 
              - **`*.apk` 是OpenWrt新版的APK包** 对于apk包跳过证书安装命令
              `apk add --allow-untrusted luci-app-frpc.apk`
