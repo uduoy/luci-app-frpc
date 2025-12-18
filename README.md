@@ -1,3 +1,4 @@
+Only Simplified Chinese.
 仅中文简体，主要是懒~
 
 用的 lua API，兼容旧版系统
