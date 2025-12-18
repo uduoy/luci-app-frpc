@@ -2,7 +2,7 @@
 
 用的 lua API，兼容旧版系统
 
-含 ipk 安装包 和 apk 安装包。
+含 ipk 安装包 和 apk 安装包。到 Release 页面下载。
 
 注意：不包含二进制可执行文件，可到下面链接下载：
 https://github.com/fatedier/frp/releases
