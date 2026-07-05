@@ -1,8 +1,33 @@
+<style>
+.frpc-config-compare { display: flex; gap: 12px; }
+.frpc-config-compare > div { flex: 1; min-width: 0; }
+.frpc-config-compare textarea { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; width: 100%; box-sizing: border-box; }
+.frpc-config-label { font-weight: bold; margin-bottom: 4px; font-size: 13px; }
+@media (max-width: 800px) { .frpc-config-compare { flex-direction: column; } }
+</style>
 
-<%+header%>
-<h2 name="title"><%=title%></h2>
-文件路径：/var/etc/frpc/frpc.main.toml（只有启用服务后才能生成）
-<div id="content_fileviewer">
-<textarea style="width: 100%" readonly="readonly" wrap="off" rows="<%=content:cmatch("\n")+1%>" id="content_id"><%=content:pcdata()%></textarea>
-</div>
-<%+footer%>
+<%
+local content = content or ""
+local example = example or ""
+local rows = math.max(content:cmatch("\n") + 1, (example:cmatch("\n") or 0) + 5)
+%>
+
+<fieldset class="cbi-section">
+	<legend><%=title or translate("配置文件")%></legend>
+	<p style="margin:0 0 8px 0;font-size:12px;color:#666">
+		<%:当前生成的配置文件路径：%>/var/etc/frpc/frpc.main.toml &nbsp;
+		<a class="cbi-button cbi-button-apply" style="font-size:11px;padding:2px 10px" href="<%=luci.dispatcher.build_url("admin/services/frpc/log")%>"><%:服务日志%></a>
+	</p>
+	<div class="frpc-config-compare">
+		<div>
+			<div class="frpc-config-label"><%:当前配置%></div>
+			<textarea class="cbi-input-textarea" id="config_content" readonly="readonly" wrap="off" rows="<%=rows%>"><%=content:pcdata()%></textarea>
+			<div style="margin-top:4px;font-size:11px;color:#999"><%:只有启用服务后才会生成配置文件%></div>
+		</div>
+		<div>
+			<div class="frpc-config-label" style="color:#0c8ee7"><%:官方示例（只读）%></div>
+			<textarea class="cbi-input-textarea" id="example_content" readonly="readonly" wrap="off" rows="<%=rows%>" style="background:#f0f7ff"><%=example:pcdata()%></textarea>
+			<div style="margin-top:4px;font-size:11px;color:#999"><%:%>参考: <a href="https://gofrp.org/zh-cn/docs/" target="_blank">gofrp.org</a></div>
+		</div>
+	</div>
+</fieldset>
