@@ -5,10 +5,8 @@ local http = require "luci.http"
 local uci = require "luci.model.uci".cursor()
 local sys = require "luci.sys"
 
--- 查看配置文件所需
+-- 查看配置文件所需（lazy require，需在 dispatcher 上下文中）
 local e=require"nixio.fs"
-local t=require"luci.sys"
-local a=require"luci.template"
 local t=require"luci.i18n"
 
 module("luci.controller.frpc", package.seeall)
@@ -61,7 +59,8 @@ end
 
 function view_conf()
 local e=e.readfile("/var/etc/frpc/frpc.main.toml")or""
-a.render("frpc/file_viewer",
+local template = require "luci.template"
+template.render("frpc/file_viewer",
 {title=t.translate("Frpc - 查看配置文件"),content=e})
 end
 
