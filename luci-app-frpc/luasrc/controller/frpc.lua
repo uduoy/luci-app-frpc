@@ -19,24 +19,23 @@ function index()
 	entry({"admin", "services", "frpc"},
 		firstchild(), _("Frpc")).dependent = false
 
-	entry({"admin", "services", "frpc", "common"},
-		cbi("frpc/common"), _("设置"), 1)
+	entry({"admin", "services", "frpc", "dashboard"},
+		template("frpc/dashboard"), _("管理"), 1)
 
 	entry({"admin", "services", "frpc", "rules"},
 		arcombine(cbi("frpc/rules"), cbi("frpc/rule-detail")),
 		_("规则"), 2).leaf = true
 
-	entry({"admin", "services", "frpc", "servers"},
-		arcombine(cbi("frpc/servers"), cbi("frpc/server-detail")),
-		_("服务器"), 3).leaf = true
+	entry({"admin", "services", "frpc", "common"},
+		cbi("frpc/common"), _("设置"), 3)
 
 	entry({"admin", "services", "frpc", "status"}, call("action_status"))
 	
-	entry({"admin", "services", "frpc", "configuration"}, call("view_conf"), _("查看配置"), 5).leaf = true
+	entry({"admin", "services", "frpc", "configuration"}, call("view_conf"), _("查看配置"), 4).leaf = true
 	
 	entry({"admin", "services", "frpc", "get_log"}, call("get_log")).leaf = true
 	entry({"admin", "services", "frpc", "clear_log"}, call("clear_log")).leaf = true
-	entry({"admin", "services", "frpc", "log"}, cbi("frpc/log"), _("查看日志"), 8).leaf = true
+	entry({"admin", "services", "frpc", "log"}, cbi("frpc/log"), _("查看日志"), 5).leaf = true
 end
 
 
