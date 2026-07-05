@@ -5,25 +5,125 @@
 
 <%
 local dsp = require "luci.dispatcher"
+local sys = require "luci.sys"
+local uci = require "luci.model.uci".cursor()
+local fs = require "nixio.fs"
+
+-- 检查运行状态
+local function is_running()
+	local client = uci:get("frpc", "main", "client_file")
+	if client and client ~= "" then
+		local file_name = client:match(".*/([^/]+)$") or ""
+		if file_name ~= "" then
+			return sys.call("pidof %s >/dev/null" % file_name) == 0
+		end
+	end
+	return false
+end
+local running = is_running()
 -%>
 
-<fieldset class="cbi-section">
-	<p id="frpc_status">
-		<em><%:Collecting data...%></em>
-	</p>
+<style>
+/* ===== Frpc Global UI Tweaks ===== */
+/* 状态卡片 */
+.cbi-section-status {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px !important;
+  padding: 20px 24px !important;
+  margin-bottom: 20px;
+  background: #fff;
+}
+.cbi-section-status .status-row { display: flex; align-items: center; gap: 12px; }
+.status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.status-dot.up { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,.5); }
+.status-dot.down { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,.5); }
+.status-actions { margin-left: auto; display: flex; gap: 8px; }
+.status-actions .cbi-button { padding: 6px 16px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; }
+.cbi-section-status .status-meta { margin-top: 12px; display: flex; gap: 24px; font-size: 12px; color: #94a3b8; }
+.cbi-section-status .status-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* CBI 表单美化 */
+.cbi-section { border-radius: 12px !important; border: 1px solid #e2e8f0 !important; background: #fff !important; }
+.cbi-section h3, .cbi-section h4 { font-size: 14px; font-weight: 600; color: #1e293b; padding: 12px 16px 0; }
+.cbi-section .cbi-section-node { padding: 12px 16px; }
+.cbi-value { padding: 8px 16px !important; }
+.cbi-value-title { font-size: 13px !important; font-weight: 500 !important; color: #334155 !important; width: 200px !important; }
+.cbi-value input[type="text"], .cbi-value input[type="password"], .cbi-value select {
+  padding: 6px 10px !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; font-size: 14px !important;
+  background: #fff !important; transition: border-color .15s !important;
+}
+.cbi-value input:focus, .cbi-value select:focus { outline: 0 !important; border-color: #0c8ee7 !important; box-shadow: 0 0 0 3px rgba(12,142,231,.12) !important; }
+.cbi-value .cbi-value-description { font-size: 12px !important; color: #94a3b8 !important; margin-top: 2px !important; }
+.cbi-value input.cbi-button { border: 1px solid #e2e8f0 !important; background: #fff !important; padding: 6px 14px !important; }
+.cbi-value input.cbi-button:hover { background: #f1f5f9 !important; }
+.cbi-section .cbi-tabmenu { border-bottom: 1px solid #e2e8f0 !important; padding: 0 16px !important; }
+.cbi-section .cbi-tabmenu li a { font-size: 13px !important; padding: 10px 16px !important; color: #64748b !important; border: 0 !important; border-bottom: 2px solid transparent !important; background: none !important; }
+.cbi-section .cbi-tabmenu li a:hover { color: #334155 !important; border-bottom-color: #cbd5e1 !important; }
+.cbi-section .cbi-tabmenu li.br a { color: #0c8ee7 !important; border-bottom-color: #0c8ee7 !important; }
+.cbi-page-actions { text-align: right !important; padding: 16px !important; border-top: 1px solid #f1f5f9 !important; }
+.cbi-page-actions .cbi-button { border-radius: 8px !important; padding: 8px 20px !important; font-size: 13px !important; }
+.cbi-page-actions .cbi-button-apply { background: #0c8ee7 !important; color: #fff !important; border: 0 !important; }
+.cbi-page-actions .cbi-button-apply:hover { background: #0070c4 !important; }
+.cbi-page-actions .cbi-button-reset { background: #fff !important; border: 1px solid #e2e8f0 !important; color: #475569 !important; }
+.cbi-page-actions .cbi-button-reset:hover { background: #f8fafc !important; }
+
+/* 表格（规则/服务器列表） */
+.cbi-section-table { border-radius: 12px !important; overflow: hidden !important; border: 1px solid #e2e8f0 !important; }
+.cbi-section-table table { width: 100% !important; }
+.cbi-section-table th { background: #f8fafc !important; font-size: 11px !important; text-transform: uppercase !important; letter-spacing: .05em !important; color: #64748b !important; padding: 12px 16px !important; }
+.cbi-section-table td { padding: 10px 16px !important; border-top: 1px solid #f1f5f9 !important; }
+.cbi-section-table tr:hover td { background: #f8fafc !important; }
+
+@media (max-width: 640px) {
+  .cbi-section-status .status-row { flex-wrap: wrap; }
+  .status-actions { margin-left: 0; margin-top: 8px; }
+}
+</style>
+
+<fieldset class="cbi-section cbi-section-status">
+	<div class="status-row">
+		<div class="status-indicator">
+			<span class="status-dot <% if running then %>up<% else %>down<% end %>"></span>
+			<span style="color:<% if running then %>#16a34a<% else %>#dc2626<% end %>">
+				<%= running and translate("Frpc 运行中") or translate("Frpc 未运行") %>
+			</span>
+		</div>
+		<div class="status-actions">
+			<input class="cbi-button cbi-button-apply" type="button" value="<%=translate("重启")%>" onclick="location.reload()" />
+			<input class="cbi-button cbi-button-reset" type="button" value="<%=translate("停止")%>" onclick="location.reload()" />
+		</div>
+	</div>
+	<div class="status-meta">
+		<span>
+			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+			<%=translate("状态")%>: <%= running and translate("运行中") or translate("已停止") %>
+		</span>
+		<span>
+			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+			<%=translate("自动刷新中")%>
+		</span>
+	</div>
 </fieldset>
 
 <script type="text/javascript">//<![CDATA[
 	XHR.poll(5, '<%=dsp.build_url("admin/services/frpc/status")%>', null,
 		function (x, data) {
-			if (x.status !== 200 || !data) {
-				return;
+			if (x.status !== 200 || !data) return;
+			var el = document.querySelector('.cbi-section-status');
+			if (!el) return;
+			var dot = el.querySelector('.status-dot');
+			var txt = el.querySelector('.status-indicator > span:last-child');
+			if (!dot || !txt) return;
+			if (data.running) {
+				dot.className = 'status-dot up';
+				txt.style.color = '#16a34a';
+				txt.textContent = '<%=translate("Frpc 运行中")%>';
+			} else {
+				dot.className = 'status-dot down';
+				txt.style.color = '#dc2626';
+				txt.textContent = '<%=translate("Frpc 未运行")%>';
 			}
-
-			var frpcStatusElm = document.getElementById('frpc_status');
-			frpcStatusElm.innerHTML = data.running
-				? '<b><font color=green><%:Frpc 运行中%></font></b>'
-				: '<b><font color=red><%:Frpc 未运行%></font></b>';
 		}
 	);
 //]]></script>
