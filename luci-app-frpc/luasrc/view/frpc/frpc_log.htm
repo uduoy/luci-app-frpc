@@ -1,36 +1,93 @@
+<style>
+.cbi-section-log {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  background: #fff;
+  overflow: hidden;
+}
+.cbi-section-log .log-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap; gap: 8px;
+}
+.cbi-section-log .log-toolbar .log-hint { font-size: 12px; color: #94a3b8; }
+.cbi-section-log .log-toolbar .log-actions { display: flex; gap: 8px; }
+.cbi-section-log .log-toolbar .cbi-button {
+  padding: 6px 14px; font-size: 12px; font-weight: 500;
+  border-radius: 8px; cursor: pointer; border: 1px solid #e2e8f0;
+  background: #fff; color: #475569;
+}
+.cbi-section-log .log-toolbar .cbi-button:hover { background: #f1f5f9; }
+.cbi-section-log .log-toolbar .cbi-button-reset { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.cbi-section-log .log-toolbar .cbi-button-reset:hover { background: #fee2e2; }
+.cbi-section-log .log-auto-label {
+  display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b;
+}
+.cbi-section-log .log-auto-label .pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.cbi-section-log .log-container {
+  background: #0f172a; padding: 16px;
+}
+.cbi-section-log .log-content {
+  font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 13px; line-height: 1.65; color: #34d399;
+  white-space: pre; overflow-x: auto; overflow-y: auto;
+  height: 480px; min-height: 200px; resize: vertical;
+}
+@media (max-width: 640px) {
+  .cbi-section-log .log-content { height: 300px; }
+}
+</style>
+
+<fieldset class="cbi-section cbi-section-log" id="_log_fieldset">
+	<div class="log-toolbar">
+		<div class="log-auto-label">
+			<span class="pulse-dot"></span>
+			<span><%:自动刷新%></span>
+		</div>
+		<div class="log-hint">
+			<%:若日志时间显示不对，例如：与上海时间相差8小时，请安装 zoneinfo-asia 软件包，然后重启设备%>
+		</div>
+		<div class="log-actions">
+			<input class="cbi-button cbi-button-reset" type="button" value="<%:清空日志%>" onclick="clear_log()" />
+		</div>
+	</div>
+	<div class="log-container">
+		<div class="log-content" id="log_textarea"></div>
+	</div>
+</fieldset>
+
 <script type="text/javascript">
 	//<![CDATA[
-	function clear_log(btn) {
+	function clear_log() {
 		XHR.get('<%=url([[admin]], [[services]], [[frpc]], [[clear_log]])%>', null,
-			function(x, data) {
-				if(x && x.status == 200) {
-					var log_textarea = document.getElementById('log_textarea');
-					log_textarea.innerHTML = "";
-					log_textarea.scrollTop = log_textarea.scrollHeight;
+			function(x) {
+				if (x && x.status == 200) {
+					var el = document.getElementById('log_textarea');
+					if (el) el.innerHTML = '';
 				}
-				location.reload();
 			}
 		);
 	}
-	var scrolled = false;
+	var _scrolled = false;
 	XHR.poll(2, '<%=url([[admin]], [[services]], [[frpc]], [[get_log]])%>', null,
-		function(x, data) {
-			if(x && x.status == 200) {
-				var log_textarea = document.getElementById('log_textarea');
-				var str = x.responseText;
-				var logs = str.replace(//g, "🔧");
-				log_textarea.innerHTML = logs;
-				if (!scrolled) {
-					log_textarea.scrollTop = log_textarea.scrollHeight;
-					scrolled = true;
+		function(x) {
+			if (x && x.status == 200) {
+				var el = document.getElementById('log_textarea');
+				if (!el) return;
+				var str = x.responseText || '';
+				var logs = str.replace(/\u001b/g, '🔧');
+				el.textContent = logs;
+				if (!_scrolled) {
+					el.scrollTop = el.scrollHeight;
+					_scrolled = true;
 				}
 			}
 		}
 	);
 	//]]>
 </script>
-<fieldset class="cbi-section" id="_log_fieldset">
-	<input class="cbi-button cbi-input-remove" type="button" onclick="clear_log()" value="<%:清空日志%>" style="margin-left: 10px; margin-top: 10px;">
-	&nbsp;（若日志时间显示不对，例如：与上海时间相差8小时，请安装 zoneinfo-asia 软件包，然后重启设备）
-	<textarea id="log_textarea" class="cbi-input-textarea" style="width: calc(100% - 20px); height: 500px; margin: 10px;" data-update="change" rows="5" wrap="off" readonly="readonly"></textarea>
-</fieldset>
