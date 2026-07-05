@@ -2,7 +2,7 @@
 
 OpenWrt LuCI 管理界面 for frp 内网穿透客户端 & 服务端。
 
-## 变更日志 (2025-07-05)
+## 变更日志 (2026-07-05)
 
 > ⚡ 由 AI vibe coding 辅助完成（DeepSeek V4 Pro via CodeBuddy）
 
