@@ -5,61 +5,25 @@
 
 <%
 local dsp = require "luci.dispatcher"
-local sys = require "luci.sys"
-local uci = require "luci.model.uci".cursor()
-
-local function is_running()
-	local client = uci:get("frpc", "main", "client_file")
-	if client and client ~= "" then
-		local file_name = client:match(".*/([^/]+)$") or ""
-		if file_name ~= "" then
-			return sys.call("pidof %s >/dev/null" % file_name) == 0
-		end
-	end
-	return false
-end
-local running = is_running()
 -%>
 
-<style>
-.frpc-status { margin-bottom: 16px; }
-.frpc-status .status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.frpc-status .status-actions { margin-left: auto; }
-@media (max-width: 600px) { .frpc-status .status-actions { margin-left: 0; } }
-</style>
-
-<fieldset class="cbi-section frpc-status">
-	<legend><%:运行状态%></legend>
-	<div class="status-row">
-		<img src="<%=resource%>/icons/<%=running and "loading.gif" or "signal_offline.png"%>" style="vertical-align:middle;width:16px;height:16px" />
-		<strong style="color:<%=running and "green" or "red"%>">
-			<%=running and translate("Frpc 运行中") or translate("Frpc 未运行")%>
-		</strong>
-		<div class="status-actions">
-			<input class="cbi-button cbi-button-apply" type="button" value="<%=translate("重启")%>" onclick="location.reload()" />
-			<input class="cbi-button cbi-button-reset" type="button" value="<%=translate("停止")%>" onclick="location.reload()" />
-		</div>
-	</div>
+<fieldset class="cbi-section">
+	<p id="frpc_status">
+		<em><%:Collecting data...%></em>
+	</p>
 </fieldset>
 
 <script type="text/javascript">//<![CDATA[
 	XHR.poll(5, '<%=dsp.build_url("admin/services/frpc/status")%>', null,
 		function (x, data) {
-			if (x.status !== 200 || !data) return;
-			var fs = document.querySelector('.frpc-status');
-			if (!fs) return;
-			var strong = fs.querySelector('strong');
-			var img = fs.querySelector('img');
-			if (!strong || !img) return;
-			if (data.running) {
-				strong.style.color = 'green';
-				strong.textContent = '<%=translate("Frpc 运行中")%>';
-				img.src = '<%=resource%>/icons/loading.gif';
-			} else {
-				strong.style.color = 'red';
-				strong.textContent = '<%=translate("Frpc 未运行")%>';
-				img.src = '<%=resource%>/icons/signal_offline.png';
+			if (x.status !== 200 || !data) {
+				return;
 			}
+
+			var frpcStatusElm = document.getElementById('frpc_status');
+			frpcStatusElm.innerHTML = data.running
+				? '<b><font color=green><%:Frpc 运行中%></font></b>'
+				: '<b><font color=red><%:Frpc 未运行%></font></b>';
 		}
 	);
 //]]></script>

@@ -1,34 +1,8 @@
-<style>
-.frpc-config-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
-.frpc-config-toolbar .cbi-button { font-size: 12px; }
-.frpc-config-path { font-size: 12px; color: #666; font-family: monospace; }
-</style>
 
-<%
-local content = content or ""
-%>
-
-<fieldset class="cbi-section">
-	<legend><%=title or translate("配置文件")%></legend>
-	<div class="frpc-config-toolbar">
-		<span class="frpc-config-path">/var/etc/frpc/frpc.main.toml</span>
-		<input class="cbi-button" id="copy_btn" type="button" value="<%:复制%>" onclick="copyConfig()" />
-	</div>
-	<textarea class="cbi-input-textarea" id="config_content" readonly="readonly" wrap="off" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:13px" rows="<%=content:cmatch("\n")+1%>"><%=content:pcdata()%></textarea>
-	<div style="margin-top:6px;font-size:12px;color:#666"><%:提示：只有启用服务后才能生成配置文件%></div>
-</fieldset>
-
-<script type="text/javascript">
-	//<![CDATA[
-	function copyConfig() {
-		var el = document.getElementById('config_content');
-		if (!el) return;
-		var btn = document.getElementById('copy_btn');
-		el.select();
-		try {
-			document.execCommand('copy');
-			if (btn) { btn.value = '<%:已复制%>'; setTimeout(function(){ btn.value = '<%:复制%>'; }, 2000); }
-		} catch(e) {}
-	}
-	//]]>
-</script>
+<%+header%>
+<h2 name="title"><%=title%></h2>
+文件路径：/var/etc/frpc/frpc.main.toml（只有启用服务后才能生成）
+<div id="content_fileviewer">
+<textarea style="width: 100%" readonly="readonly" wrap="off" rows="<%=content:cmatch("\n")+1%>" id="content_id"><%=content:pcdata()%></textarea>
+</div>
+<%+footer%>
