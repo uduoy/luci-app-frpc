@@ -59,23 +59,23 @@ end
 
 function view_conf()
 local e=e.readfile("/var/etc/frpc/frpc.main.toml")or""
-local example = [[# ===== frp 官方配置示例 (frpc) =====
+local example = [=[# ===== frp 官方配置示例 (frpc) =====
 # 文档: https://gofrp.org/zh-cn/docs/
 
-# [[连接服务端]]
+# ==[连接服务端]==
 serverAddr = "0.0.0.0"         # 服务端地址(必填)
 serverPort = 7000               # 服务端端口(必填)
 
-# [[认证]]
+# ==[认证]==
 auth.method = "token"           # token / oidc
 auth.token = "your_token"       # 鉴权令牌
 
-# [[传输配置]]
+# ==[传输配置]==
 [transport]
 protocol = "tcp"                # tcp/kcp/quic/websocket
 tcpMux = true                   # 启用TCP多路复用
 
-# [[日志配置]]
+# ==[日志配置]==
 [log]
 to = "/var/log/frpc.log"       # 日志文件路径
 level = "info"                  # trace/debug/info/warn/error
@@ -83,7 +83,7 @@ maxDays = 3
 
 # ===== 代理示例 =====
 
-# [[TCP代理 — 暴露本地SSH]]
+# [TCP代理 — 暴露本地SSH]
 [[proxies]]
 name = "ssh"
 type = "tcp"
@@ -91,23 +91,22 @@ localIP = "127.0.0.1"
 localPort = 22
 remotePort = 6000
 
-# [[HTTP代理 — 域名访问内网Web]]
+# [HTTP代理 — 域名访问内网Web]
 # [[proxies]]
 # name = "web"
 # type = "http"
 # localIP = "127.0.0.1"
 # localPort = 80
 # subdomain = "www"
-# customDomains = ["your.domain.com"]
 
-# [[安全TCP — 点对点P2P直连]]
+# [安全TCP — 点对点P2P直连]
 # [[proxies]]
 # name = "secret_ssh"
 # type = "stcp"
 # secretKey = "abc123"
 # localIP = "127.0.0.1"
 # localPort = 22
-]]
+]=]
 
 local template = require "luci.template"
 template.render("frpc/file_viewer",
