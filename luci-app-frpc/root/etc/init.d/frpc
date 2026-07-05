@@ -44,6 +44,10 @@ frpc_scetion_validate() {
 		'transport__poolCount:uinteger' \
 		'user:string' \
 		'transport__protocol:string' \
+		'transport__wireProtocol:string' \
+		'transport__connectServerLocalIP:ip4addr' \
+		'transport__dialServerTimeout:integer' \
+		'transport__dialServerKeepalive:integer' \
 		'transport__quic__keepalivePeriod:integer' \
 		'transport__quic__maxIdleTimeout:integer' \
 		'transport__quic__maxIncomingStreams:uinteger' \
@@ -58,11 +62,17 @@ frpc_scetion_validate() {
 		'natHoleStunServer:string' \
 		'transport__heartbeatInterval:integer' \
 		'transport__heartbeatTimeout:integer' \
+		'udpPacketSize:uinteger' \
+		'auth__additionalScopes:string' \
+		'start:list(string)' \
+		'metadatas:list(string)' \
 		'com_extra_options:list(string)' \
 		'webServer__addr:host' \
 		'webServer__port:port' \
 		'webServer__user:string' \
-		'webServer__password:string'
+		'webServer__password:string' \
+		'webServer__assetsDir:string' \
+		'webServer__pprofEnable:or("true", "false")'
 }
 
 server_section_validate() {

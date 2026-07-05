@@ -85,6 +85,20 @@ for user in util.execi("cat /etc/passwd | cut -d':' -f1") do
 	o:value(user)
 end
 
+o = s:taboption("general", Value, "transport__connectServerLocalIP", translate("连接绑定本机IP"),
+	translate("连接服务端时绑定使用的本机IP地址，留空自动选择"))
+o.datatype = "ip4addr"
+
+o = s:taboption("general", Value, "transport__dialServerTimeout", translate("连接超时"),
+	translate("连接服务端的超时时间（秒），默认为10秒"))
+o.datatype = "integer"
+o.placeholder = '10'
+
+o = s:taboption("general", Value, "transport__dialServerKeepalive", translate("连接保活间隔"),
+	translate("与服务端连接的保活间隔（秒），默认7200"))
+o.datatype = "integer"
+o.placeholder = '7200'
+
 o = s:taboption("general", Flag, "enable_logging", translate("日志配置"),
 	translate("Frp 运行日志设置。不含 luci-app 日志（此部分在“系统日志”查看）"))
 
@@ -128,6 +142,12 @@ o.placeholder = '0'
 
 o = s:taboption("advanced", Value, "user", translate("Frpc用户名"),
 	translate("设置后代理名称将变为{user}.{proxy}，例如：user1.ssh"))
+
+o = s:taboption("advanced", ListValue, "transport__wireProtocol", translate("线缆协议版本"),
+	translate("frp内部协议版本，v1兼容旧版，v2支持更多特性（需新版frps），留空默认v1"))
+o:value("", translate("-- 默认(v1) --"))
+o:value("v1")
+o:value("v2")
 
 o = s:taboption("advanced", Value, "transport__protocol", translate("通信协议"),
 	translate("和服务端通信所使用的协议，留空默认：tcp，还可选quic、kcp、websocket、wss..."))
@@ -199,6 +219,26 @@ o = s:taboption("advanced", Value, "transport__heartbeatTimeout", translate("心
 o.datatype = "integer"
 --o.placeholder = "90"
 
+o = s:taboption("advanced", Value, "udpPacketSize", translate("UDP包大小"),
+	translate("UDP 数据包的最大传输大小（字节），默认1500，仅需在UDP代理出现片段问题时调整"))
+o.datatype = "uinteger"
+o.placeholder = '1500'
+
+o = s:taboption("advanced", Value, "auth__additionalScopes", translate("认证附加范围"),
+	translate("额外认证范围，多个用逗号分隔，可选 HeartBeats, NewWorkConns"))
+o:value("", translate("（无）"))
+o:value("HeartBeats")
+o:value("NewWorkConns")
+o:value("HeartBeats,NewWorkConns")
+
+o = s:taboption("advanced", DynamicList, "start", translate("启动代理白名单"),
+	translate("留空表示启动全部代理。填写代理名称后仅启动列表中指定的代理，一行一个"))
+o.placeholder = "proxy_name"
+
+o = s:taboption("advanced", DynamicList, "metadatas", translate("客户端元数据"),
+	translate("版主如 v0.60+: 客户端级别元数据，格式 key=value，可在服务端基于元数据路由"))
+o.placeholder = "key = value"
+
 o = s:taboption("advanced", DynamicList, "com_extra_options", translate("额外选项"),
 	translate("点击添加列表，一行一条，将写入通用参数末尾，格式错误会导致服务启动失败"))
 o.placeholder = "option = value"
@@ -213,5 +253,13 @@ o = s:taboption("manage", Value, "webServer__user", translate("管理用户"))
 
 o = s:taboption("manage", Value, "webServer__password", translate("管理密码"))
 o.password = true
+
+o = s:taboption("manage", Value, "webServer__assetsDir", translate("面板资源目录"),
+	translate("管理面板静态资源目录，留空使用内置资源"))
+
+o = s:taboption("manage", Flag, "webServer__pprofEnable", translate("启用pprof调试"),
+	translate("启用 Golang pprof 性能分析，通常在开发调试时使用"))
+o.enabled = "true"
+o.disabled = ""
 
 return m
