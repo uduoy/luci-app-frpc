@@ -163,6 +163,22 @@ o:depends("keepTunnelOpen", "true")
 o.placeholder = "90"
 o.datatype = "integer"
 
+o = s:option(Value, "fallbackTo", translate("回退访客"), translate("v0.60+: 穿透失败时回退到的备选访客名称"))
+o:depends("visitor", "1")
+
+o = s:option(Value, "fallbackTimeoutMs", translate("回退超时(毫秒)"), translate("回退超时时间"))
+o:depends({visitor="1", fallbackTo="", fallbackTo=nil})
+o:depends("fallbackTo", "")
+o.datatype = "integer"
+o.placeholder = "1000"
+
+o = s:option(Flag, "natTraversal__disableAssistedAddrs", translate("禁用穿透辅助地址"), translate("v0.60+: 禁用NAT穿透时发送本地辅助地址，有助于在复杂网络环境中减少不必要的地址信息泄露"))
+o:depends("visitor", "1")
+o:depends("type", "stcp")
+o:depends("type", "xtcp")
+o.enabled = "true"
+o.disabled = ""
+
 o = s:option(Value, "httpUser", translate("HTTP 用户"))
 o:depends("type", "http")
 o:depends("type", "tcpmux")
@@ -187,6 +203,19 @@ o:depends("type", "http")
 o = s:option(Value, "hostHeaderRewrite", translate("主机头重写"))
 o:depends("type", "http")
 o:depends("type", "https")
+
+o = s:option(Value, "routeByHTTPUser", translate("按HTTP用户路由"), translate("v0.60+: 对指定 HTTP Basic 认证用户名的请求单独路由"))
+o:depends("type", "http")
+o:depends("type", "tcpmux")
+
+o = s:option(DynamicList, "requestHeaders__set", translate("自定义请求头"), translate("v0.60+: 设置转发到本地服务的HTTP请求头，格式 key: value，一行一条"))
+o:depends("type", "http")
+o:depends("type", "https")
+o.placeholder = "X-Custom-Header: value"
+
+o = s:option(DynamicList, "responseHeaders__set", translate("自定义响应头"), translate("v0.60+: 设置返回给客户端的HTTP响应头，格式 key: value，一行一条"))
+o:depends("type", "http")
+o.placeholder = "X-Custom-Header: value"
 
 o = s:option(Value, "transport__bandwidthLimit", translate("带宽限流大小"), translate("单位为 MB 或 KB，例如：3MB"))
 o = s:option(ListValue, "transport__bandwidthLimitMode", translate("带宽限流类型"), translate("留空默认：client"))
@@ -252,6 +281,26 @@ o.datatype = "uinteger"
 o.placeholder = "10"
 o:depends("healthCheck__type", "tcp")
 o:depends("healthCheck__type", "http")
+
+o = s:option(DynamicList, "healthCheck__httpHeaders", "%s - %s" % { translate("健康检查"), translate("自定义HTTP头") },
+	translate("v0.60+: HTTP健康检查时附加的自定义头，格式 key: value，一行一条"))
+o:depends("healthCheck__type", "http")
+o.placeholder = "Authorization: Bearer xxx"
+
+o = s:option(DynamicList, "metadatas", translate("代理元数据"),
+	translate("v0.60+: 代理级别元数据，格式 key=value，可在服务端基于元数据路由"))
+o.placeholder = "env = production"
+
+o = s:option(DynamicList, "annotations", translate("注解"),
+	translate("v0.60+: 仅为信息展示，不影响功能，格式 key=value"))
+o.placeholder = "desc = SSH tunnel"
+
+o = s:option(Flag, "natTraversal__disableAssistedAddrs", translate("禁用穿透辅助地址"), translate("v0.60+: 禁用NAT穿透时发送本地辅助地址(非访客模式)"))
+o:depends("visitor", "")
+o:depends("type", "stcp")
+o:depends("type", "xtcp")
+o.enabled = "true"
+o.disabled = ""
 
 o = s:option(DynamicList, "extra_options", translate("额外选项 1"),
 	translate("点击添加列表1，写入 [[proxies]] 或 [[visitors]] 末尾，一行一条，格式错误可能无法启动服务"))

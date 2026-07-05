@@ -97,11 +97,19 @@ function frpc.read_uci(uci_path)
 		if lists then
 			rule["_extras"] = lists["extra_options"]
 			rule["_plugin_extras"] = lists["extra_options_plugin"]
+			rule["requestHeaders__set"] = lists["requestHeaders__set"]
+			rule["responseHeaders__set"] = lists["responseHeaders__set"]
+			rule["healthCheck__httpHeaders"] = lists["healthCheck__httpHeaders"]
+			rule["metadatas"] = lists["metadatas"]
+			rule["annotations"] = lists["annotations"]
 			rule["_lists"] = nil
 		end
 	end
 	if config.main and config.main["_lists"] then
-		config.main["com_extra_options"] = config.main["_lists"]["com_extra_options"]
+		local lists = config.main["_lists"]
+		config.main["com_extra_options"] = lists["com_extra_options"]
+		config.main["start"] = lists["start"]
+		config.main["metadatas"] = lists["metadatas"]
 		config.main["_lists"] = nil
 	end
 
@@ -124,6 +132,7 @@ frpc.schema = {
 		{ "natHoleStunServer",   "natHoleStunServer", "string" },
 		{ "dnsServer",           "dnsServer",         "string" },
 		{ "loginFailExit",       "loginFailExit",     "bool" },
+		{ "udpPacketSize",       "udpPacketSize",     "int" },
 	},
 
 	-- 服务端字段合并到顶层 (来自 frpc server)
@@ -147,6 +156,10 @@ frpc.schema = {
 		{ prefix = "transport",  header = "transport",  fields = {
 			{ "poolCount",                "poolCount",           "int" },
 			{ "protocol",                 "protocol",            "string" },
+			{ "wireProtocol",             "wireProtocol",        "string" },
+			{ "connectServerLocalIP",     "connectServerLocalIP", "string" },
+			{ "dialServerTimeout",        "dialServerTimeout",   "int" },
+			{ "dialServerKeepalive",      "dialServerKeepalive", "int" },
 			{ "proxyURL",                "proxyURL",            "string" },
 			{ "heartbeatInterval",       "heartbeatInterval",   "int" },
 			{ "heartbeatTimeout",        "heartbeatTimeout",    "int" },
@@ -170,6 +183,8 @@ frpc.schema = {
 			{ "port",              "port",              "int" },
 			{ "user",              "user",              "string" },
 			{ "password",          "password",          "string" },
+			{ "assetsDir",         "assetsDir",         "string" },
+			{ "pprofEnable",       "pprofEnable",       "bool" },
 		}},
 	},
 
@@ -204,6 +219,7 @@ frpc.schema = {
 			{ "healthCheck__timeoutSeconds",   "healthCheck.timeoutSeconds",   "int" },
 			{ "healthCheck__maxFailed",        "healthCheck.maxFailed",        "int" },
 			{ "healthCheck__intervalSeconds",  "healthCheck.intervalSeconds",  "int" },
+			{ "routeByHTTPUser",   "routeByHTTPUser",   "string" },
 			{ "httpUser",          "httpUser",          "string" },
 			{ "httpPassword",     "httpPassword",      "string" },
 			{ "subdomain",        "subdomain",         "string" },
@@ -218,6 +234,9 @@ frpc.schema = {
 			{ "keepTunnelOpen",   "keepTunnelOpen",    "bool" },
 			{ "maxRetriesAnHour", "maxRetriesAnHour",  "int" },
 			{ "minRetryInterval", "minRetryInterval",  "int" },
+			{ "fallbackTo",       "fallbackTo",        "string" },
+			{ "fallbackTimeoutMs","fallbackTimeoutMs", "int" },
+			{ "natTraversal__disableAssistedAddrs", "natTraversal.disableAssistedAddrs", "bool" },
 		},
 		plugin = {
 			type_key = "PlUgIn_type",
