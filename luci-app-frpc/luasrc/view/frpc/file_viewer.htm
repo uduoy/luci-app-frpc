@@ -26,9 +26,9 @@ local rows = math.max(content:cmatch("\n") + 1, (example:cmatch("\n") or 0) + 5)
 			<div style="margin-top:4px;font-size:11px;color:#999"><%:只有启用服务后才会生成配置文件%></div>
 		</div>
 		<div>
-			<div class="frpc-config-label" style="color:#0c8ee7"><%:官方示例（只读）%></div>
-			<textarea class="cbi-input-textarea" id="example_content" readonly="readonly" wrap="off" rows="<%=rows%>" style="background:#f0f7ff"><%=example:pcdata()%></textarea>
-			<div style="margin-top:4px;font-size:11px;color:#999"><%:%>参考: <a href="https://gofrp.org/zh-cn/docs/" target="_blank">gofrp.org</a></div>
+			<div class="frpc-config-label"><%:官方示例（只读）%></div>
+			<textarea class="cbi-input-textarea" id="example_content" readonly="readonly" wrap="off" rows="<%=rows%>"><%=example:pcdata()%></textarea>
+			<div style="margin-top:4px;font-size:11px;color:#999"><%:参考: %> <a href="https://gofrp.org/zh-cn/docs/" target="_blank">gofrp.org</a></div>
 		</div>
 	</div>
 </fieldset>
