@@ -141,6 +141,7 @@ frpc.schema = {
 		{ "serverPort",          "serverPort",          "int" },
 		{ "auth__method",        "auth.method",         "string" },
 		{ "auth__token",         "auth.token",          "string" },
+		{ "clientID",            "clientID",            "string" },
 		{ "transport__tcpMux",   "transport.tcpMux",    "bool" },
 		{ "transport__tcpMuxKeepaliveInterval", "transport.tcpMuxKeepaliveInterval", "int" },
 	},
