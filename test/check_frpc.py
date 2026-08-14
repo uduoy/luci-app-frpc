@@ -68,6 +68,17 @@ def main():
     check("init.d 校验 auth__oidc__insecureSkipVerify", has("'auth__oidc__insecureSkipVerify:or(\"true\", \"false\")'", INITD))
     check("server-detail.lua 含 auth__oidc__issuerURL 选项", has('"auth__oidc__issuerURL"', SERVER_DETAIL))
 
+    # === Task 4: auth.oidc.tokenSource (kvarr) ===
+    check("schema 含 auth__oidc__tokenSource__type", schema_has(r'"auth__oidc__tokenSource__type"'))
+    check("schema 含 auth__oidc__tokenSource__exec__command", schema_has(r'"auth__oidc__tokenSource__exec__command"'))
+    check("schema 含 auth__oidc__tokenSource__exec__args", schema_has(r'"auth__oidc__tokenSource__exec__args"'))
+    check("schema 含 auth__oidc__tokenSource__exec__env (kvarr)", schema_has(r'"auth__oidc__tokenSource__exec__env".*"kvarr"'))
+    check("toml_gen 引擎含 kvarr 处理", has('kvarr', TOMLGEN))
+    check("init.d 校验 tokenSource__type", has("'auth__oidc__tokenSource__type:string'", INITD))
+    check("init.d 校验 tokenSource__exec__command", has("'auth__oidc__tokenSource__exec__command:string'", INITD))
+    check("init.d 校验 tokenSource__exec__args", has("'auth__oidc__tokenSource__exec__args:string'", INITD))
+    check("init.d 校验 tokenSource__exec__env", has("'auth__oidc__tokenSource__exec__env:string'", INITD))
+
     if _failures:
         print("")
         print("FAILED: %d 项" % len(_failures))

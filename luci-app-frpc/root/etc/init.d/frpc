@@ -73,6 +73,11 @@ frpc_scetion_validate() {
 		'auth__oidc__skipExpiryCheck:or("true", "false")' \
 		'auth__oidc__skipIssuerValidation:or("true", "false")' \
 		'auth__oidc__insecureSkipVerify:or("true", "false")' \
+		'auth__oidc__tokenSource__type:string' \
+		'auth__oidc__tokenSource__file__path:string' \
+		'auth__oidc__tokenSource__exec__command:string' \
+		'auth__oidc__tokenSource__exec__args:string' \
+		'auth__oidc__tokenSource__exec__env:string' \
 		'start:list(string)' \
 		'metadatas:list(string)' \
 		'com_extra_options:list(string)' \
