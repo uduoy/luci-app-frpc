@@ -70,62 +70,84 @@ end
 -- ===== 内部：渲染引擎 =====
 
 -- 渲染 global 字段
-local function render_global(lines, config, fields, section_name)
+-- @param skip_prefix 若设置，则 toml_key 以此前缀开头的字段不在此处写出
+--                    （交由 render_subtables 统一写进对应子表，避免重复定义表）
+local function render_global(lines, config, fields, section_name, skip_prefix)
 	local src = config[section_name]
 	if not src then return end
 	for _, f in ipairs(fields) do
 		local uci_key, toml_key, typ = f[1], f[2], f[3]
 		if toml_key then  -- nil 表示跳过
-			local v = src[uci_key]
-			if v and v ~= "" then
-				local tv = toml_value(v, typ)
-				if tv then lines[#lines + 1] = toml_key .. " = " .. tv end
+			if skip_prefix and toml_key:sub(1, #skip_prefix) == skip_prefix then
+				-- 交给 render_subtables 统一渲染到子表，避免 table already exists
+			else
+				local v = src[uci_key]
+				if v and v ~= "" then
+					local tv = toml_value(v, typ)
+					if tv then lines[#lines + 1] = toml_key .. " = " .. tv end
+				end
 			end
 		end
 	end
 end
 
--- 渲染子表 [header] （从 config.main 读取，key 带前缀）
+-- 渲染子表 [header]
+-- 字段来源: config.main + config.server（transport 等字段可同时存在于 main 与 server，
+-- 必须合并进同一个子表，否则顶层 key 与 [table] 重复定义导致 frpc 解析失败）
 local function render_subtables(lines, config, subs)
 	for _, sub in ipairs(subs) do
 		local prefix, header = sub.prefix, sub.header
 		local fields, nested = sub.fields, sub.subtables
-		local src = config.main
-		if src then
-			-- 检查是否有值
-			local has = false
-			local check = function(tbl)
-				for _, f in ipairs(tbl) do
-					if src[prefix .. "__" .. f[1]] then has = true; return end
+		local sources = { config.main }
+		if config.server then sources[#sources + 1] = config.server end
+
+		-- 跨 main/server 取值
+		local function get(k)
+			for _, s in ipairs(sources) do
+				if s and s[prefix .. "__" .. k] then return s[prefix .. "__" .. k] end
+			end
+			return nil
+		end
+		local function get_nested(nprefix, k)
+			for _, s in ipairs(sources) do
+				if s and s[nprefix .. "__" .. k] then return s[nprefix .. "__" .. k] end
+			end
+			return nil
+		end
+
+		-- 检查是否有值
+		local has = false
+		local check = function(tbl)
+			for _, f in ipairs(tbl) do
+				if get(f[1]) then has = true; return end
+			end
+		end
+		check(fields)
+		if not has and nested then
+			for _, ns in ipairs(nested) do
+				check(ns.fields)
+				if has then break end
+			end
+		end
+		if has then
+			lines[#lines + 1] = ""
+			lines[#lines + 1] = "[" .. header .. "]"
+			for _, f in ipairs(fields) do
+				local v = get(f[1])
+				if v and v ~= "" then
+					local tv = toml_value(v, f[3])
+					if tv then lines[#lines + 1] = f[2] .. " = " .. tv end
 				end
 			end
-			check(fields)
-			if not has and nested then
+			-- 嵌套子表展平写入
+			if nested then
 				for _, ns in ipairs(nested) do
-					check(ns.fields)
-					if has then break end
-				end
-			end
-			if has then
-				lines[#lines + 1] = ""
-				lines[#lines + 1] = "[" .. header .. "]"
-				for _, f in ipairs(fields) do
-					local v = src[prefix .. "__" .. f[1]]
-					if v and v ~= "" then
-						local tv = toml_value(v, f[3])
-						if tv then lines[#lines + 1] = f[2] .. " = " .. tv end
-					end
-				end
-				-- 嵌套子表展平写入
-				if nested then
-					for _, ns in ipairs(nested) do
-						local nprefix = prefix .. "__" .. ns.prefix
-						for _, f in ipairs(ns.fields) do
-							local v = src[nprefix .. "__" .. f[1]]
-							if v and v ~= "" then
-								local tv = toml_value(v, f[3])
-								if tv then lines[#lines + 1] = "  " .. f[2] .. " = " .. tv end
-							end
+					local nprefix = prefix .. "__" .. ns.prefix
+					for _, f in ipairs(ns.fields) do
+						local v = get_nested(nprefix, f[1])
+						if v and v ~= "" then
+							local tv = toml_value(v, f[3])
+							if tv then lines[#lines + 1] = "  " .. f[2] .. " = " .. tv end
 						end
 					end
 				end
@@ -210,7 +232,8 @@ function toml_gen.render(config, schema)
 		render_global(lines, config, schema.global, "main")
 	end
 	if schema.server_global and config.server then
-		render_global(lines, config, schema.server_global, "server")
+		-- transport.* 统一交给 render_subtables 写进 [transport]，此处跳过避免重复定义
+		render_global(lines, config, schema.server_global, "server", "transport.")
 	end
 
 	-- 子表

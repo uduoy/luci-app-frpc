@@ -163,8 +163,6 @@ frpc.schema = {
 		{ "auth__oidc__tokenSource__exec__command",  "auth.oidc.tokenSource.exec.command",  "string" },
 		{ "auth__oidc__tokenSource__exec__args",     "auth.oidc.tokenSource.exec.args",     "arr" },
 		{ "auth__oidc__tokenSource__exec__env",      "auth.oidc.tokenSource.exec.env",      "kvarr" },
-		{ "transport__tcpMux",   "transport.tcpMux",    "bool" },
-		{ "transport__tcpMuxKeepaliveInterval", "transport.tcpMuxKeepaliveInterval", "int" },
 	},
 
 	-- 子表: [section_header]
@@ -185,6 +183,8 @@ frpc.schema = {
 			{ "proxyURL",                "proxyURL",            "string" },
 			{ "heartbeatInterval",       "heartbeatInterval",   "int" },
 			{ "heartbeatTimeout",        "heartbeatTimeout",    "int" },
+			{ "tcpMux",                  "tcpMux",              "bool" },
+			{ "tcpMuxKeepaliveInterval", "tcpMuxKeepaliveInterval", "int" },
 		}, subtables = {
 			{ prefix = "quic", fields = {
 				{ "keepalivePeriod",     "keepalivePeriod",     "int" },
