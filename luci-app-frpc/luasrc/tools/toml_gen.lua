@@ -50,6 +50,17 @@ local function toml_value(val, typ)
 		end
 		return #parts == 0 and "[]" or ("[" .. table.concat(parts, ", ") .. "]")
 	end
+	if typ == "kvarr" then
+		-- key=value 列表 (每行一个), 渲染为 [{name="k", value="v"}, ...]
+		local items = {}
+		for line in val:gmatch("[^\r\n]+") do
+			local k, v = line:match("^%s*([^=]+)%s*=%s*(.-)%s*$")
+			if k and k ~= "" then
+				items[#items + 1] = '{name="' .. k .. '", value="' .. v .. '"}'
+			end
+		end
+		return #items == 0 and "[]" or ("[" .. table.concat(items, ", ") .. "]")
+	end
 	-- 默认 string
 	return '"' .. val .. '"'
 end

@@ -72,6 +72,29 @@ o.enabled = "true"
 o.disabled = ""
 o:depends("auth__method", "oidc")
 
+o = s:option(ListValue, "auth__oidc__tokenSource__type", translate("tokenSource 类型"),
+	translate("v0.66+: 令牌来源类型，file 从文件读取，exec 执行命令获取"))
+o:value("", translate("（无）"))
+o:value("file")
+o:value("exec")
+o:depends("auth__method", "oidc")
+
+o = s:option(Value, "auth__oidc__tokenSource__file__path", translate("tokenSource 文件路径"),
+	translate("type=file 时令牌文件所在路径"))
+o:depends("auth__oidc__tokenSource__type", "file")
+
+o = s:option(Value, "auth__oidc__tokenSource__exec__command", translate("tokenSource 命令"),
+	translate("type=exec 时获取令牌的执行命令"))
+o:depends("auth__oidc__tokenSource__type", "exec")
+
+o = s:option(Value, "auth__oidc__tokenSource__exec__args", translate("tokenSource 命令参数"),
+	translate("type=exec 时命令参数，空格分隔"))
+o:depends("auth__oidc__tokenSource__type", "exec")
+
+o = s:option(DynamicList, "auth__oidc__tokenSource__exec__env", translate("tokenSource 环境变量"),
+	translate("type=exec 时环境变量，格式 key=value，一行一个"))
+o:depends("auth__oidc__tokenSource__type", "exec")
+
 o = s:option(Flag, "transport__tcpMux", translate("关闭 TCP 复用"), translate("Frpc 默认开启 tcpMux。提示：frpc 和 frps 要作相同设置"))
 o.enabled = "false"
 o.disabled = ""
