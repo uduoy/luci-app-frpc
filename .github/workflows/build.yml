@@ -91,19 +91,47 @@ jobs:
           MAKEFLAGS: -j$(nproc)
           V: s
 
-      - name: Upload artifacts
+      - name: 校验产物格式
+        run: |
+          DIR="bin/packages/${{ matrix.arch }}/packages_ci"
+          if [ "${{ matrix.sdk }}" = "SNAPSHOT" ]; then
+            if [ -z "$(ls "$DIR"/*.apk 2>/dev/null)" ]; then
+              echo "::error::SNAPSHOT 分支未生成 .apk 产物，构建可能未启用 apk"
+              exit 1
+            fi
+          else
+            if [ -z "$(ls "$DIR"/*.ipk 2>/dev/null)" ]; then
+              echo "::error::${{ matrix.sdk }} 未生成 .ipk 产物"
+              exit 1
+            fi
+          fi
+
+      - name: Upload ipk artifacts
+        if: ${{ matrix.sdk != 'SNAPSHOT' }}
         uses: actions/upload-artifact@v4
         with:
-          name: luci-app-frp-${{ matrix.arch }}-${{ matrix.sdk }}
-          path: bin/packages/${{ matrix.arch }}/packages_ci/
+          name: luci-app-frp-${{ matrix.arch }}-${{ matrix.sdk }}-ipk
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
+
+      - name: Upload apk artifacts
+        if: ${{ matrix.sdk == 'SNAPSHOT' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-app-frp-${{ matrix.arch }}-${{ matrix.sdk }}-apk
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.apk
 
       - name: Create compress files
+        if: ${{ github.event.inputs.tag != '' }}
         run: |
           sudo timedatectl set-timezone "Asia/Shanghai"
           echo "build_time=$(TZ=UTC-8 date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
-          #tar -zcvf luci-app-frp-${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
-          # zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.arch }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
-          zip -j luci-app-frp-${{ env.TAG }}-${{ matrix.sdk }}.zip bin/packages/${{ matrix.arch }}/packages_ci/*
+          if [ "${{ matrix.sdk }}" = "SNAPSHOT" ]; then
+            echo "PKG_SUFFIX=apk" >> "$GITHUB_ENV"
+            zip -j luci-app-frp-${{ env.TAG }}-apk.zip bin/packages/${{ matrix.arch }}/packages_ci/*.apk
+          else
+            echo "PKG_SUFFIX=ipk" >> "$GITHUB_ENV"
+            zip -j luci-app-frp-${{ env.TAG }}-ipk.zip bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
+          fi
 
       - name: Release
         if: ${{ github.event.inputs.tag != '' }}
@@ -114,7 +142,7 @@ jobs:
 
              > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }}-easytier?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.TAG }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github)
 
-             - 其中 **`22.03.7`** 里面是ipk安装包 **`SNAPSHOT`** 里面是apk安装包。注意：不包含二进制可执行文件，可到下面链接下载：
+             - 其中 **`*-ipk.zip`** 是 opkg 安装包（用 `22.03.7` SDK 编译），**`*-apk.zip`** 是 OpenWrt 新版 apk 安装包（用 `SNAPSHOT` SDK 编译，apk 在 main/SNAPSHOT 分支默认启用，24.10 仍为 opkg）。注意：不包含二进制可执行文件，可到下面链接下载：
              https://github.com/fatedier/frp/releases
 
              - **`*.apk` 是OpenWrt新版的APK包** 对于apk包跳过证书安装命令
@@ -123,5 +151,5 @@ jobs:
              ${{ github.event.inputs.text }}
            
             tag_name: ${{ env.TAG }}
-            files: luci-app-frp-${{ env.TAG }}-${{ matrix.sdk }}.zip
+            files: luci-app-frp-${{ env.TAG }}-${{ env.PKG_SUFFIX }}.zip
  
