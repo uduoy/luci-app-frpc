@@ -65,19 +65,16 @@ frpc_scetion_validate() {
 		'transport__heartbeatTimeout:integer' \
 		'udpPacketSize:uinteger' \
 		'auth__additionalScopes:string' \
-		'auth__oidc__issuerURL:string' \
 		'auth__oidc__clientID:string' \
 		'auth__oidc__clientSecret:string' \
 		'auth__oidc__audience:string' \
 		'auth__oidc__scope:string' \
-		'auth__oidc__skipExpiryCheck:or("true", "false")' \
-		'auth__oidc__skipIssuerValidation:or("true", "false")' \
-		'auth__oidc__insecureSkipVerify:or("true", "false")' \
+		'auth__oidc__tokenEndpointURL:string' \
 		'auth__oidc__tokenSource__type:string' \
 		'auth__oidc__tokenSource__file__path:string' \
 		'auth__oidc__tokenSource__exec__command:string' \
 		'auth__oidc__tokenSource__exec__args:string' \
-		'auth__oidc__tokenSource__exec__env:string' \
+		'auth__oidc__tokenSource__exec__env:list(string)' \
 		'start:list(string)' \
 		'metadatas:list(string)' \
 		'com_extra_options:list(string)' \

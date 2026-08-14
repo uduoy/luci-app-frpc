@@ -56,6 +56,8 @@ local function toml_value(val, typ)
 		for line in val:gmatch("[^\r\n]+") do
 			local k, v = line:match("^%s*([^=]+)%s*=%s*(.-)%s*$")
 			if k and k ~= "" then
+				k = k:gsub('\\', '\\\\'):gsub('"', '\\"')
+				v = v:gsub('\\', '\\\\'):gsub('"', '\\"')
 				items[#items + 1] = '{name="' .. k .. '", value="' .. v .. '"}'
 			end
 		end
