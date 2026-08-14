@@ -56,6 +56,18 @@ def main():
     check("init.d 校验 store__localPath", has("'store__localPath:string'", INITD))
     check("common.lua 含 store__path 选项", has('"store__path"', COMMON))
 
+    # === Task 3: auth.oidc OIDC ===
+    check("schema 含 auth__oidc__issuerURL", schema_has(r'"auth__oidc__issuerURL"'))
+    check("schema 含 auth__oidc__clientSecret", schema_has(r'"auth__oidc__clientSecret"'))
+    check("schema 含 auth__oidc__audience", schema_has(r'"auth__oidc__audience"'))
+    check("schema 含 auth__oidc__scope", schema_has(r'"auth__oidc__scope"'))
+    check("schema 含 auth__oidc__skipExpiryCheck (bool)", schema_has(r'"auth__oidc__skipExpiryCheck".*"bool"'))
+    check("schema 含 auth__oidc__insecureSkipVerify (bool)", schema_has(r'"auth__oidc__insecureSkipVerify".*"bool"'))
+    check("init.d 校验 auth__oidc__issuerURL", has("'auth__oidc__issuerURL:string'", INITD))
+    check("init.d 校验 auth__oidc__clientSecret", has("'auth__oidc__clientSecret:string'", INITD))
+    check("init.d 校验 auth__oidc__insecureSkipVerify", has("'auth__oidc__insecureSkipVerify:or(\"true\", \"false\")'", INITD))
+    check("server-detail.lua 含 auth__oidc__issuerURL 选项", has('"auth__oidc__issuerURL"', SERVER_DETAIL))
+
     if _failures:
         print("")
         print("FAILED: %d 项" % len(_failures))
