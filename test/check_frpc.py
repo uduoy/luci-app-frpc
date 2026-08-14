@@ -49,6 +49,13 @@ def main():
     check("init.d 校验 clientID", has("'clientID:string'", INITD))
     check("common.lua 含 clientID 选项", has('"clientID"', COMMON))
 
+    # === Task 2: [store] 持久化存储子表 ===
+    check("schema subtables 含 store", schema_has(r'prefix\s*=\s*"store"'))
+    check("init.d 校验 store__path", has("'store__path:string'", INITD))
+    check("init.d 校验 store__type", has("'store__type:string'", INITD))
+    check("init.d 校验 store__localPath", has("'store__localPath:string'", INITD))
+    check("common.lua 含 store__path 选项", has('"store__path"', COMMON))
+
     if _failures:
         print("")
         print("FAILED: %d 项" % len(_failures))
