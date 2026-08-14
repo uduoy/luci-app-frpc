@@ -143,6 +143,9 @@ o.placeholder = '0'
 o = s:taboption("advanced", Value, "user", translate("Frpc用户名"),
 	translate("设置后代理名称将变为{user}.{proxy}，用于多用户场景下区分不同客户端的代理。例如设置user为user1，则代理ssh的实际名称为user1.ssh"))
 
+o = s:taboption("advanced", Value, "clientID", translate("客户端ID"),
+	translate("v0.70+: 手动指定客户端ID，默认自动生成。用于固定标识，便于服务端按ID管理"))
+
 o = s:taboption("advanced", ListValue, "transport__wireProtocol", translate("线缆协议版本"),
 	translate("frp内部应用层协议版本，v1为基础版本兼容旧版，v2为增强版本支持更丰富的功能特性（需要frps服务端同步开启），留空默认v1"))
 o:value("", translate("-- 默认(v1) --"))

@@ -43,6 +43,7 @@ frpc_scetion_validate() {
 		'loginFailExit:or("true", "false")' \
 		'transport__poolCount:uinteger' \
 		'user:string' \
+		'clientID:string' \
 		'transport__protocol:string' \
 		'transport__wireProtocol:string' \
 		'transport__connectServerLocalIP:ip4addr' \
