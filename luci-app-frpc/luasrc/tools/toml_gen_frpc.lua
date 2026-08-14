@@ -187,6 +187,11 @@ frpc.schema = {
 			{ "assetsDir",         "assetsDir",         "string" },
 			{ "pprofEnable",       "pprofEnable",       "bool" },
 		}},
+		{ prefix = "store",  header = "store",  fields = {
+			{ "type",              "type",              "string" },
+			{ "localPath",         "localPath",         "string" },
+			{ "path",              "path",              "string" },
+		}},
 	},
 
 	-- main 额外选项

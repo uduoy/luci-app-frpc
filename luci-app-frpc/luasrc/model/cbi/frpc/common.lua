@@ -265,4 +265,19 @@ o = s:taboption("manage", Flag, "webServer__pprofEnable", translate("启用pprof
 o.enabled = "true"
 o.disabled = ""
 
+o = s:taboption("manage", ListValue, "store__type", translate("持久化存储类型"),
+	translate("v0.66+: 客户端持久化运行状态的存储后端，用于断线重连时恢复。留空默认本地文件"))
+o:value("", translate("（空 = 本地文件）"))
+o:value("local")
+o:value("redis")
+
+o = s:taboption("manage", Value, "store__localPath", translate("本地存储路径"),
+	translate("store.type=local 时的持久化文件路径，默认为 ./frpc_data.json"))
+o:depends("store__type", "local")
+o.placeholder = "./frpc_data.json"
+
+o = s:taboption("manage", Value, "store__path", translate("存储路径/地址"),
+	translate("store.type=redis 时的连接地址，例如：127.0.0.1:6379"))
+o:depends("store__type", "redis")
+
 return m
