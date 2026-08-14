@@ -38,6 +38,40 @@ o.password = true
 o:depends("auth__method", "")
 o:depends("auth__method", "token")
 
+o = s:option(Value, "auth__oidc__issuerURL", translate("OIDC 签发地址"),
+	translate("v0.65+: OIDC 身份提供商的 issuer URL，例如 https://oidc.example.com"))
+o:depends("auth__method", "oidc")
+
+o = s:option(Value, "auth__oidc__clientID", translate("OIDC 客户端ID"))
+o:depends("auth__method", "oidc")
+
+o = s:option(Value, "auth__oidc__clientSecret", translate("OIDC 客户端密钥"))
+o.password = true
+o:depends("auth__method", "oidc")
+
+o = s:option(Value, "auth__oidc__audience", translate("OIDC 受众"))
+o:depends("auth__method", "oidc")
+
+o = s:option(Value, "auth__oidc__scope", translate("OIDC 作用域"),
+	translate("空格分隔的 scope 列表，例如 openid profile"))
+o:depends("auth__method", "oidc")
+
+o = s:option(Flag, "auth__oidc__skipExpiryCheck", translate("OIDC 跳过过期检查"))
+o.enabled = "true"
+o.disabled = ""
+o:depends("auth__method", "oidc")
+
+o = s:option(Flag, "auth__oidc__skipIssuerValidation", translate("OIDC 跳过签发方校验"))
+o.enabled = "true"
+o.disabled = ""
+o:depends("auth__method", "oidc")
+
+o = s:option(Flag, "auth__oidc__insecureSkipVerify", translate("OIDC 跳过 TLS 验证"),
+	translate("跳过 OIDC issuer 的 TLS 证书验证，仅测试环境使用"))
+o.enabled = "true"
+o.disabled = ""
+o:depends("auth__method", "oidc")
+
 o = s:option(Flag, "transport__tcpMux", translate("关闭 TCP 复用"), translate("Frpc 默认开启 tcpMux。提示：frpc 和 frps 要作相同设置"))
 o.enabled = "false"
 o.disabled = ""
