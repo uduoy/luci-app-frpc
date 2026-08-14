@@ -79,6 +79,14 @@ def main():
     check("init.d 校验 tokenSource__exec__args", has("'auth__oidc__tokenSource__exec__args:string'", INITD))
     check("init.d 校验 tokenSource__exec__env", has("'auth__oidc__tokenSource__exec__env:string'", INITD))
 
+    # === Task 5: HTTPS 负载均衡组 depends ===
+    rule_lb = text(RULE_DETAIL)
+    import re as _re
+    m_group = _re.search(r'loadBalancer__group".*?depends\("type", "https"\)', rule_lb, _re.S)
+    check("rule-detail 负载均衡组依赖 https", m_group is not None)
+    m_key = _re.search(r'loadBalancer__groupKey".*?depends\("type", "https"\)', rule_lb, _re.S)
+    check("rule-detail 负载均衡密钥依赖 https", m_key is not None)
+
     if _failures:
         print("")
         print("FAILED: %d 项" % len(_failures))
