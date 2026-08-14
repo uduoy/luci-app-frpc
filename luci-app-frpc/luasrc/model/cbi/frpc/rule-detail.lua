@@ -247,11 +247,13 @@ o:depends("type", "tcpmux")
 o = s:option(Value, "loadBalancer__group", translate("负载均衡分组名"))
 o:depends("type", "tcp")
 o:depends("type", "http")
+o:depends("type", "https")
 o:depends("type", "tcpmux")
 
 o = s:option(Value, "loadBalancer__groupKey", translate("负载均衡分组密钥"))
 o:depends("type", "tcp")
 o:depends("type", "http")
+o:depends("type", "https")
 o:depends("type", "tcpmux")
 
 o = s:option(ListValue, "healthCheck__type", "%s - %s" % { translate("健康检查"), translate("类型") })
