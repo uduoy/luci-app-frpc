@@ -38,10 +38,6 @@ o.password = true
 o:depends("auth__method", "")
 o:depends("auth__method", "token")
 
-o = s:option(Value, "auth__oidc__issuerURL", translate("OIDC 签发地址"),
-	translate("v0.65+: OIDC 身份提供商的 issuer URL，例如 https://oidc.example.com"))
-o:depends("auth__method", "oidc")
-
 o = s:option(Value, "auth__oidc__clientID", translate("OIDC 客户端ID"))
 o:depends("auth__method", "oidc")
 
@@ -56,20 +52,8 @@ o = s:option(Value, "auth__oidc__scope", translate("OIDC 作用域"),
 	translate("空格分隔的 scope 列表，例如 openid profile"))
 o:depends("auth__method", "oidc")
 
-o = s:option(Flag, "auth__oidc__skipExpiryCheck", translate("OIDC 跳过过期检查"))
-o.enabled = "true"
-o.disabled = ""
-o:depends("auth__method", "oidc")
-
-o = s:option(Flag, "auth__oidc__skipIssuerValidation", translate("OIDC 跳过签发方校验"))
-o.enabled = "true"
-o.disabled = ""
-o:depends("auth__method", "oidc")
-
-o = s:option(Flag, "auth__oidc__insecureSkipVerify", translate("OIDC 跳过 TLS 验证"),
-	translate("跳过 OIDC issuer 的 TLS 证书验证，仅测试环境使用"))
-o.enabled = "true"
-o.disabled = ""
+o = s:option(Value, "auth__oidc__tokenEndpointURL", translate("OIDC Token 端点"),
+	translate("v0.65+: OIDC 令牌端点 URL，例如 https://oidc.example.com/token"))
 o:depends("auth__method", "oidc")
 
 o = s:option(ListValue, "auth__oidc__tokenSource__type", translate("tokenSource 类型"),

@@ -113,6 +113,17 @@ function frpc.read_uci(uci_path)
 		config.main["_lists"] = nil
 	end
 
+	-- server 的 list 字段同样需提为普通字段 (read_uci 把 list 收进 _lists)
+	-- 仅 auth.oidc.tokenSource.exec.env 是 list (kvarr)，按 \n 逐行拼接供 toml_value 解析
+	for _, server in ipairs(config.servers) do
+		local lists = server["_lists"]
+		if lists then
+			local env = lists["auth__oidc__tokenSource__exec__env"]
+			if env then server["auth__oidc__tokenSource__exec__env"] = table.concat(env, "\n") end
+			server["_lists"] = nil
+		end
+	end
+
 	return config
 end
 
@@ -129,6 +140,7 @@ frpc.schema = {
 		{ "user",                "user",              "string" },
 		{ "serverAddr",          "serverAddr",        "string" },
 		{ "serverPort",          "serverPort",        "int" },
+		{ "clientID",            "clientID",          "string" },
 		{ "natHoleStunServer",   "natHoleStunServer", "string" },
 		{ "dnsServer",           "dnsServer",         "string" },
 		{ "loginFailExit",       "loginFailExit",     "bool" },
@@ -141,20 +153,16 @@ frpc.schema = {
 		{ "serverPort",          "serverPort",          "int" },
 		{ "auth__method",        "auth.method",         "string" },
 		{ "auth__token",         "auth.token",          "string" },
-		{ "auth__oidc__issuerURL",        "auth.oidc.issuerURL",        "string" },
 		{ "auth__oidc__clientID",         "auth.oidc.clientID",         "string" },
 		{ "auth__oidc__clientSecret",     "auth.oidc.clientSecret",     "string" },
 		{ "auth__oidc__audience",         "auth.oidc.audience",         "string" },
 		{ "auth__oidc__scope",            "auth.oidc.scope",            "string" },
-		{ "auth__oidc__skipExpiryCheck",  "auth.oidc.skipExpiryCheck",  "bool" },
-		{ "auth__oidc__skipIssuerValidation", "auth.oidc.skipIssuerValidation", "bool" },
-		{ "auth__oidc__insecureSkipVerify", "auth.oidc.insecureSkipVerify", "bool" },
+		{ "auth__oidc__tokenEndpointURL", "auth.oidc.tokenEndpointURL", "string" },
 		{ "auth__oidc__tokenSource__type",           "auth.oidc.tokenSource.type",           "string" },
 		{ "auth__oidc__tokenSource__file__path",     "auth.oidc.tokenSource.file.path",     "string" },
 		{ "auth__oidc__tokenSource__exec__command",  "auth.oidc.tokenSource.exec.command",  "string" },
 		{ "auth__oidc__tokenSource__exec__args",     "auth.oidc.tokenSource.exec.args",     "arr" },
 		{ "auth__oidc__tokenSource__exec__env",      "auth.oidc.tokenSource.exec.env",      "kvarr" },
-		{ "clientID",            "clientID",            "string" },
 		{ "transport__tcpMux",   "transport.tcpMux",    "bool" },
 		{ "transport__tcpMuxKeepaliveInterval", "transport.tcpMuxKeepaliveInterval", "int" },
 	},
